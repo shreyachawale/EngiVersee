@@ -610,7 +610,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 // --- Stripe Setup ---
-const stripe = new Stripe("sk_test_51SBasvBUadzr6Wd84EXD1rIeDz7CoXKk0qpkI2SUdJOSVufASwN7fsOpMfzX3iIRuspHp5dLPqpm53dVQRh1b80600rJBXFU72");
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY );
 
 // --- ES Module setup ---
 const __filename = fileURLToPath(import.meta.url);
