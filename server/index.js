@@ -277,7 +277,11 @@ if (!existsSync(TEMP_REPO_DIR)) fs.mkdirSync(TEMP_REPO_DIR, { recursive: true })
 const app = express();
 const upload = multer({ dest: 'uploads/' });
 
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:5173', // Replace with your frontend's URL
+  methods: ['GET', 'POST', 'PUT', 'DELETE'], // Allowed HTTP methods
+  credentials: true, // If you need to send cookies or authentication headers
+}));
 app.use(express.json());
 
 // ========================
