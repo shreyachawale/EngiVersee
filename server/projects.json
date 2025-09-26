@@ -143,5 +143,39 @@
     "files": [],
     "createdAt": "2025-09-26T08:05:37.538Z",
     "id": "1758873937538"
+  },
+  {
+    "title": "codebase",
+    "shortDescription": "codebase",
+    "description": "codebase",
+    "githubUrl": "https://github.com/Vedant-H/codebase.git",
+    "demoUrl": "",
+    "videoUrl": "",
+    "category": "Web Development",
+    "difficulty": "Beginner",
+    "techStack": [
+      "React"
+    ],
+    "tags": [],
+    "owner": {
+      "id": "current-user",
+      "name": "Jordan Smith",
+      "email": "jordan@example.com",
+      "avatar": "https://images.pexels.com/photos/1181424/pexels-photo-1181424.jpeg?w=150",
+      "role": "contributor",
+      "skills": [
+        "React",
+        "TypeScript",
+        "Python",
+        "Machine Learning"
+      ],
+      "projects": [
+        "3"
+      ],
+      "mentorProjects": []
+    },
+    "files": [],
+    "createdAt": "2025-09-26T10:29:38.796Z",
+    "id": "1758882578797"
   }
 ]

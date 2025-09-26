@@ -1,0 +1,77 @@
+Here's an analysis of the provided error log, classifying issues by risk level for each mentioned tool.
+
+### ESLint
+
+#### High Risk
+No high-risk issues detected by ESLint.
+
+#### Medium Risk
+No medium-risk issues detected by ESLint.
+
+#### Low Risk
+*   **File:** `src\components\UI\ProjectCard.tsx`
+    *   **Summary:** The `TrendingUp` import is defined but never used. Remove this import to clean up the code.
+*   **File:** `src\context\AppContext.tsx`
+    *   **Summary:** A warning indicates that non-component exports (like constants or functions) are present in a file that also exports components. This can interfere with React Fast Refresh. Consider moving these non-component exports to a separate file.
+*   **File:** `src\pages\Dashboard.tsx`
+    *   **Summary:** The imports `Calendar`, `Clock`, and `Activity` are defined but never used. Remove these unused imports.
+*   **File:** `src\pages\Home.tsx`
+    *   **Summary:** The import `PlayCircle` is defined but never used. Remove this unused import.
+*   **File:** `src\pages\Mentor.tsx`
+    *   **Summary:** The imports `Clock`, `Filter`, `X`, and the variable `user` are defined but never used. Remove these unused declarations.
+*   **File:** `src\pages\ProjectDetail.tsx`
+    *   **Summary:** The imports `Play` and `MoreVertical` are defined but never used. Remove these unused imports.
+*   **File:** `src\pages\Projects.tsx`
+    *   **Summary:**
+        *   The import `SortAsc` is defined but never used. Remove this unused import.
+        *   The variable `filtered` is declared with `let` but is never reassigned. Change its declaration to `const` for better immutability and clarity.
+*   **File:** `src\pages\Upload.tsx`
+    *   **Summary:** The variable `error` is defined but never used. Remove this unused variable.
+
+### Pylint
+No Python files were found or processed by Pylint.
+
+#### High Risk
+No issues detected.
+
+#### Medium Risk
+No issues detected.
+
+#### Low Risk
+No issues detected.
+
+### Bandit
+No Python files were found or processed by Bandit.
+
+#### High Risk
+No issues detected.
+
+#### Medium Risk
+No issues detected.
+
+#### Low Risk
+No issues detected.
+
+### Semgrep
+No Python files were found or processed by Semgrep.
+
+#### High Risk
+No issues detected.
+
+#### Medium Risk
+No issues detected.
+
+#### Low Risk
+No issues detected.
+
+### TypeScript Compiler (tsc)
+No TypeScript compilation errors were reported by `tsc`.
+
+#### High Risk
+No issues detected.
+
+#### Medium Risk
+No issues detected.
+
+#### Low Risk
+No issues detected.
