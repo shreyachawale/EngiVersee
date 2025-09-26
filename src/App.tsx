@@ -6,6 +6,7 @@ import ToastProvider from './components/UI/Toast';
 import Home from './pages/Home';
 import Projects from './pages/Projects';
 import ProjectDetail from './pages/ProjectDetail';
+import ProjectReport from './pages/ProjectReport';
 import Upload from './pages/Upload';
 import Dashboard from './pages/Dashboard';
 import Mentor from './pages/Mentor';
@@ -24,6 +25,7 @@ function App() {
               <Route path="/upload" element={<Upload />} />
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/mentor" element={<Mentor />} />
+              <Route path="/project-report/:id" element={<ProjectReport />} />
             </Routes>
           </main>
           <ToastProvider />

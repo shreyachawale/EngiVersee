@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Upload as UploadIcon, X, Plus, Github, Link, FileText, Video } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import { Project } from '../types';
+import { uploadProjectToBackend } from '../api';
 import { toast } from 'react-toastify';
 
 const Upload: React.FC = () => {
@@ -147,33 +148,10 @@ const Upload: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
     if (!validateForm()) return;
-    
     setIsSubmitting(true);
-
     try {
-      // Simulate file upload delay
-      await new Promise(resolve => setTimeout(resolve, 2000));
-
-      const newProject: Omit<Project, 'id' | 'createdAt' | 'lastActivity'> = {
-        ...formData,
-        progress: 0,
-        contributors: [],
-        owner: user,
-        adopted: false,
-        milestones: [
-          {
-            id: '1',
-            title: 'Initial Setup',
-            description: 'Project setup and basic structure',
-            completed: true,
-            completedAt: new Date()
-          }
-        ]
-      };
-
-      addProject(newProject);
+      await uploadProjectToBackend({ ...formData, owner: user }, files);
       toast.success('Project uploaded successfully!');
       navigate('/dashboard');
     } catch (error) {

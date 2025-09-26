@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { Project, User, Notification } from '../types';
-import { mockProjects, mockUser, mockNotifications } from '../data/mockData';
+import { mockUser, mockNotifications } from '../data/mockData';
 
 interface AppContextType {
   projects: Project[];
@@ -18,7 +18,7 @@ interface AppContextType {
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [projects, setProjects] = useState<Project[]>(mockProjects);
+  const [projects, setProjects] = useState<Project[]>([]);
   const [user, setUser] = useState<User>(mockUser);
   const [notifications, setNotifications] = useState<Notification[]>(mockNotifications);
   const [isDarkMode, setIsDarkMode] = useState(false);
@@ -28,6 +28,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     if (savedTheme) {
       setIsDarkMode(JSON.parse(savedTheme));
     }
+    // Fetch projects from backend
+    fetch('http://localhost:5000/projects')
+      .then(res => res.json())
+      .then(data => setProjects(data))
+      .catch(() => setProjects([]));
   }, []);
 
   const toggleDarkMode = () => {
@@ -59,15 +64,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     });
   };
 
-  const addProject = (projectData: Omit<Project, 'id' | 'createdAt' | 'lastActivity'>) => {
-    const newProject: Project = {
-      ...projectData,
-      id: Date.now().toString(),
-      createdAt: new Date(),
-      lastActivity: new Date(),
-    };
-    
-    setProjects(prev => [newProject, ...prev]);
+  const addProject = async (projectData: Omit<Project, 'id' | 'createdAt' | 'lastActivity'>) => {
+    // After upload, refetch projects from backend
+    await fetch('http://localhost:5000/projects')
+      .then(res => res.json())
+      .then(data => setProjects(data));
   };
 
   const updateProject = (projectId: string, updates: Partial<Project>) => {

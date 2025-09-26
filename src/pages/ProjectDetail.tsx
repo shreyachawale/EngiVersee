@@ -8,13 +8,11 @@ import {
   Users, 
   Calendar, 
   TrendingUp,
-  Play,
   Brain,
   FileText,
   Target,
   CheckCircle,
-  Clock,
-  MoreVertical
+  Clock
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import Modal from '../components/UI/Modal';
@@ -28,6 +26,8 @@ const ProjectDetail: React.FC = () => {
   const [selectedAIInsight, setSelectedAIInsight] = useState<'health' | 'steps' | 'pitch' | null>(null);
 
   const project = projects.find(p => p.id === id);
+  // Support both aiInsights (old) and aiAnalysis (new)
+  const ai = project?.aiAnalysis || project?.aiInsights;
 
   if (!project) {
     return (
@@ -64,6 +64,14 @@ const ProjectDetail: React.FC = () => {
     }
   };
 
+  // Provide default empty arrays to avoid undefined.map errors
+  const techStack = project.techStack || [];
+  const milestones = project.milestones || [];
+  const contributors = project.contributors || [];
+  const tags = project.tags || [];
+  const nextSteps = project.aiInsights?.nextSteps || [];
+  const pitchDeck = project.aiInsights?.pitchDeck || [];
+
   return (
     <div className={`min-h-screen ${isDarkMode ? 'bg-gray-900' : 'bg-gray-50'}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -92,34 +100,26 @@ const ProjectDetail: React.FC = () => {
                 }`}>
                   {project.title}
                 </h1>
-                {isAdopted && (
-                  <CheckCircle className="h-6 w-6 text-green-500" />
-                )}
+                {isAdopted && <CheckCircle className="h-6 w-6 text-green-500" />}
               </div>
               
-              <p className={`text-lg mb-6 ${
-                isDarkMode ? 'text-gray-300' : 'text-gray-700'
-              }`}>
+              <p className={`text-lg mb-6 ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                 {project.description}
               </p>
 
               {/* Metadata */}
               <div className="flex flex-wrap items-center gap-6 text-sm">
                 <div className="flex items-center space-x-2">
-                  <Users className={`h-4 w-4 ${
-                    isDarkMode ? 'text-gray-400' : 'text-gray-500'
-                  }`} />
+                  <Users className={`h-4 w-4 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`} />
                   <span className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>
-                    {project.contributors.length} contributors
+                    {contributors.length} contributors
                   </span>
                 </div>
                 <span className={`px-3 py-1 rounded-full text-sm font-medium ${getDifficultyColor(project.difficulty)}`}>
                   {project.difficulty}
                 </span>
                 <div className="flex items-center space-x-2">
-                  <Calendar className={`h-4 w-4 ${
-                    isDarkMode ? 'text-gray-400' : 'text-gray-500'
-                  }`} />
+                  <Calendar className={`h-4 w-4 ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`} />
                   <span className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>
                     Last updated {new Date(project.lastActivity).toLocaleDateString()}
                   </span>
@@ -168,6 +168,18 @@ const ProjectDetail: React.FC = () => {
                     <ExternalLink className="h-5 w-5" />
                   </a>
                 )}
+                {/* View full AI report */}
+                <button
+                  onClick={() => navigate(`/project-report/${project.id}`)}
+                  className={`px-4 py-2 rounded-lg transition-colors flex items-center space-x-2 ${
+                    isDarkMode
+                      ? 'bg-purple-700 hover:bg-purple-600 text-white'
+                      : 'bg-purple-50 hover:bg-purple-100 text-purple-700'
+                  }`}
+                >
+                  <Brain className="h-4 w-4" />
+                  <span className="text-sm">View Report</span>
+                </button>
               </div>
             </div>
           </div>
@@ -175,20 +187,14 @@ const ProjectDetail: React.FC = () => {
           {/* Progress Bar */}
           <div className="mt-6">
             <div className="flex justify-between items-center mb-2">
-              <span className={`text-sm font-medium ${
-                isDarkMode ? 'text-gray-300' : 'text-gray-700'
-              }`}>
+              <span className={`text-sm font-medium ${isDarkMode ? 'text-gray-300' : 'text-gray-700'}`}>
                 Project Progress
               </span>
-              <span className={`text-sm font-bold ${
-                isDarkMode ? 'text-blue-400' : 'text-blue-600'
-              }`}>
+              <span className={`text-sm font-bold ${isDarkMode ? 'text-blue-400' : 'text-blue-600'}`}>
                 {project.progress}%
               </span>
             </div>
-            <div className={`w-full bg-gray-200 rounded-full h-3 ${
-              isDarkMode ? 'bg-gray-700' : 'bg-gray-200'
-            }`}>
+            <div className={`w-full bg-gray-200 rounded-full h-3 ${isDarkMode ? 'bg-gray-700' : 'bg-gray-200'}`}>
               <div 
                 className="bg-gradient-to-r from-blue-600 to-emerald-500 h-3 rounded-full transition-all duration-500"
                 style={{ width: `${project.progress}%` }}
@@ -201,16 +207,12 @@ const ProjectDetail: React.FC = () => {
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-8">
             {/* Tech Stack */}
-            <div className={`rounded-xl p-6 ${
-              isDarkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-gray-200'
-            }`}>
-              <h2 className={`text-xl font-semibold mb-4 ${
-                isDarkMode ? 'text-white' : 'text-gray-900'
-              }`}>
+            <div className={`rounded-xl p-6 ${isDarkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-gray-200'}`}>
+              <h2 className={`text-xl font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                 Technology Stack
               </h2>
               <div className="flex flex-wrap gap-3">
-                {project.techStack.map((tech, index) => (
+                {techStack.map((tech, index) => (
                   <span
                     key={index}
                     className={`px-4 py-2 rounded-lg text-sm font-medium ${
@@ -227,12 +229,8 @@ const ProjectDetail: React.FC = () => {
 
             {/* Demo Video */}
             {project.videoUrl && (
-              <div className={`rounded-xl p-6 ${
-                isDarkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-gray-200'
-              }`}>
-                <h2 className={`text-xl font-semibold mb-4 ${
-                  isDarkMode ? 'text-white' : 'text-gray-900'
-                }`}>
+              <div className={`rounded-xl p-6 ${isDarkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-gray-200'}`}>
+                <h2 className={`text-xl font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                   Demo Video
                 </h2>
                 <div className="aspect-video rounded-lg overflow-hidden">
@@ -247,35 +245,21 @@ const ProjectDetail: React.FC = () => {
             )}
 
             {/* Project Timeline */}
-            <div className={`rounded-xl p-6 ${
-              isDarkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-gray-200'
-            }`}>
-              <h2 className={`text-xl font-semibold mb-6 ${
-                isDarkMode ? 'text-white' : 'text-gray-900'
-              }`}>
+            <div className={`rounded-xl p-6 ${isDarkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-gray-200'}`}>
+              <h2 className={`text-xl font-semibold mb-6 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                 Project Timeline
               </h2>
               <div className="space-y-4">
-                {project.milestones.map((milestone) => (
+                {milestones.map((milestone) => (
                   <div key={milestone.id} className="flex items-start space-x-4">
-                    <div className={`mt-1 ${
-                      milestone.completed ? 'text-green-500' : isDarkMode ? 'text-gray-600' : 'text-gray-400'
-                    }`}>
-                      {milestone.completed ? (
-                        <CheckCircle className="h-6 w-6" />
-                      ) : (
-                        <Clock className="h-6 w-6" />
-                      )}
+                    <div className={`mt-1 ${milestone.completed ? 'text-green-500' : isDarkMode ? 'text-gray-600' : 'text-gray-400'}`}>
+                      {milestone.completed ? <CheckCircle className="h-6 w-6" /> : <Clock className="h-6 w-6" />}
                     </div>
                     <div className="flex-1">
-                      <h3 className={`font-medium ${
-                        isDarkMode ? 'text-white' : 'text-gray-900'
-                      }`}>
+                      <h3 className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                         {milestone.title}
                       </h3>
-                      <p className={`text-sm ${
-                        isDarkMode ? 'text-gray-400' : 'text-gray-600'
-                      }`}>
+                      <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                         {milestone.description}
                       </p>
                       {milestone.completedAt && (
@@ -284,9 +268,7 @@ const ProjectDetail: React.FC = () => {
                         </p>
                       )}
                       {milestone.dueDate && !milestone.completed && (
-                        <p className={`text-xs mt-1 ${
-                          isDarkMode ? 'text-yellow-400' : 'text-yellow-600'
-                        }`}>
+                        <p className={`text-xs mt-1 ${isDarkMode ? 'text-yellow-400' : 'text-yellow-600'}`}>
                           Due: {new Date(milestone.dueDate).toLocaleDateString()}
                         </p>
                       )}
@@ -300,12 +282,8 @@ const ProjectDetail: React.FC = () => {
           {/* Sidebar */}
           <div className="space-y-8">
             {/* Contributors */}
-            <div className={`rounded-xl p-6 ${
-              isDarkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-gray-200'
-            }`}>
-              <h2 className={`text-xl font-semibold mb-4 ${
-                isDarkMode ? 'text-white' : 'text-gray-900'
-              }`}>
+            <div className={`rounded-xl p-6 ${isDarkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-gray-200'}`}>
+              <h2 className={`text-xl font-semibold mb-4 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                 Contributors
               </h2>
               <div className="space-y-4">
@@ -316,19 +294,15 @@ const ProjectDetail: React.FC = () => {
                     className="w-10 h-10 rounded-full object-cover"
                   />
                   <div>
-                    <p className={`font-medium ${
-                      isDarkMode ? 'text-white' : 'text-gray-900'
-                    }`}>
+                    <p className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                       {project.owner.name}
                     </p>
-                    <p className={`text-sm ${
-                      isDarkMode ? 'text-gray-400' : 'text-gray-600'
-                    }`}>
+                    <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                       Project Owner
                     </p>
                   </div>
                 </div>
-                {project.contributors.map((contributor) => (
+                {contributors.map((contributor) => (
                   <div key={contributor.id} className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
                       <img
@@ -337,21 +311,15 @@ const ProjectDetail: React.FC = () => {
                         className="w-10 h-10 rounded-full object-cover"
                       />
                       <div>
-                        <p className={`font-medium ${
-                          isDarkMode ? 'text-white' : 'text-gray-900'
-                        }`}>
+                        <p className={`font-medium ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                           {contributor.name}
                         </p>
-                        <p className={`text-sm ${
-                          isDarkMode ? 'text-gray-400' : 'text-gray-600'
-                        }`}>
+                        <p className={`text-sm ${isDarkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                           {contributor.role}
                         </p>
                       </div>
                     </div>
-                    <span className={`text-xs px-2 py-1 rounded-full ${
-                      isDarkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-600'
-                    }`}>
+                    <span className={`text-xs px-2 py-1 rounded-full ${isDarkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-600'}`}>
                       {contributor.contributions} commits
                     </span>
                   </div>
@@ -359,101 +327,64 @@ const ProjectDetail: React.FC = () => {
               </div>
             </div>
 
-            {/* AI Project Reviver */}
-            {project.aiInsights && (
-              <div className={`rounded-xl p-6 ${
-                isDarkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-gray-200'
-              }`}>
-                <h2 className={`text-xl font-semibold mb-4 flex items-center space-x-2 ${
-                  isDarkMode ? 'text-white' : 'text-gray-900'
-                }`}>
+            {/* AI Project Analysis */}
+            {ai && (
+              <div className={`rounded-xl p-6 ${isDarkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-gray-200'}`}>
+                <h2 className={`text-xl font-semibold mb-4 flex items-center space-x-2 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                   <Brain className="h-6 w-6 text-purple-500" />
-                  <span>AI Project Reviver</span>
+                  <span>AI Project Analysis</span>
                 </h2>
-                
                 <div className="space-y-3">
-                  <button
-                    onClick={() => setSelectedAIInsight('health')}
-                    className={`w-full p-4 rounded-lg border transition-all hover:scale-105 ${
-                      isDarkMode 
-                        ? 'bg-purple-900/20 border-purple-800 hover:bg-purple-900/30' 
-                        : 'bg-purple-50 border-purple-200 hover:bg-purple-100'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-3">
-                        <TrendingUp className="h-5 w-5 text-purple-500" />
-                        <span className={`font-medium ${
-                          isDarkMode ? 'text-purple-400' : 'text-purple-700'
-                        }`}>
-                          Health Report
-                        </span>
-                      </div>
-                      <span className={`text-2xl font-bold ${
-                        isDarkMode ? 'text-purple-400' : 'text-purple-600'
-                      }`}>
-                        {project.aiInsights.healthScore}/100
-                      </span>
+                  {ai.summary && (
+                    <div>
+                      <h4 className="font-semibold mb-1">Summary</h4>
+                      <p className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>{ai.summary}</p>
                     </div>
-                  </button>
-
-                  <button
-                    onClick={() => setSelectedAIInsight('steps')}
-                    className={`w-full p-4 rounded-lg border transition-all hover:scale-105 ${
-                      isDarkMode 
-                        ? 'bg-blue-900/20 border-blue-800 hover:bg-blue-900/30' 
-                        : 'bg-blue-50 border-blue-200 hover:bg-blue-100'
-                    }`}
-                  >
-                    <div className="flex items-center space-x-3">
-                      <Target className="h-5 w-5 text-blue-500" />
-                      <span className={`font-medium ${
-                        isDarkMode ? 'text-blue-400' : 'text-blue-700'
-                      }`}>
-                        Next Steps
-                      </span>
+                  )}
+                  {ai.qualityReport && (
+                    <div>
+                      <h4 className="font-semibold mb-1">Quality Report</h4>
+                      <ul className="list-disc pl-5">
+                        <li>Unit Tests: {ai.qualityReport.hasUnitTests}</li>
+                        <li>Documentation: {ai.qualityReport.hasDocumentation}</li>
+                        <li>Complexity: {ai.qualityReport.complexityRating}</li>
+                      </ul>
                     </div>
-                  </button>
-
-                  <button
-                    onClick={() => setSelectedAIInsight('pitch')}
-                    className={`w-full p-4 rounded-lg border transition-all hover:scale-105 ${
-                      isDarkMode 
-                        ? 'bg-emerald-900/20 border-emerald-800 hover:bg-emerald-900/30' 
-                        : 'bg-emerald-50 border-emerald-200 hover:bg-emerald-100'
-                    }`}
-                  >
-                    <div className="flex items-center space-x-3">
-                      <FileText className="h-5 w-5 text-emerald-500" />
-                      <span className={`font-medium ${
-                        isDarkMode ? 'text-emerald-400' : 'text-emerald-700'
-                      }`}>
-                        Pitch Deck
-                      </span>
+                  )}
+                  {ai.criticalIssues && ai.criticalIssues.length > 0 && (
+                    <div>
+                      <h4 className="font-semibold mb-1 text-red-500">Critical Issues</h4>
+                      <ul className="list-disc pl-5">
+                        {ai.criticalIssues.map((issue, idx) => (
+                          <li key={idx}>{issue}</li>
+                        ))}
+                      </ul>
                     </div>
-                  </button>
+                  )}
+                  {ai.suggestedFeatures && ai.suggestedFeatures.length > 0 && (
+                    <div>
+                      <h4 className="font-semibold mb-1 text-blue-500">Suggested Features</h4>
+                      <ul className="list-disc pl-5">
+                        {ai.suggestedFeatures.map((feature, idx) => (
+                          <li key={idx}>{feature}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
                 </div>
               </div>
             )}
 
             {/* Tags */}
-            <div className={`rounded-xl p-6 ${
-              isDarkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-gray-200'
-            }`}>
-              <h3 className={`font-semibold mb-3 ${
-                isDarkMode ? 'text-white' : 'text-gray-900'
-              }`}>
+            <div className={`rounded-xl p-6 ${isDarkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-gray-200'}`}>
+              <h3 className={`font-semibold mb-3 ${isDarkMode ? 'text-white' : 'text-gray-900'}`}>
                 Tags
               </h3>
               <div className="flex flex-wrap gap-2">
-                {project.tags.map((tag, index) => (
+                {tags.map((tag, index) => (
                   <span
                     key={index}
-                    className={`px-3 py-1 text-sm rounded-full ${
-                      isDarkMode 
-                        ? 'bg-gray-700 text-gray-300' 
-                        : 'bg-gray-100 text-gray-700'
-                    }`}
+                    className={`px-3 py-1 text-sm rounded-full ${isDarkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-100 text-gray-700'}`}
                   >
                     #{tag}
                   </span>
@@ -468,114 +399,59 @@ const ProjectDetail: React.FC = () => {
       <Modal
         isOpen={showAdoptModal}
         onClose={() => setShowAdoptModal(false)}
-        title="Adopt This Project"
+        title="Confirm Adoption"
       >
         <div className="space-y-4">
-          <p className={isDarkMode ? 'text-gray-300' : 'text-gray-600'}>
-            Are you sure you want to adopt "{project.title}"? This will add it to your dashboard and you'll be able to contribute to its development.
-          </p>
-          <div className="flex space-x-4">
-            <button
-              onClick={handleAdopt}
-              className="flex-1 py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
-            >
-              Yes, Adopt Project
-            </button>
+          <p>Are you sure you want to adopt <strong>{project.title}</strong>?</p>
+          <div className="flex justify-end space-x-3">
             <button
               onClick={() => setShowAdoptModal(false)}
-              className={`flex-1 py-2 px-4 rounded-lg border transition-colors ${
-                isDarkMode
-                  ? 'border-gray-600 text-gray-300 hover:bg-gray-700'
-                  : 'border-gray-300 text-gray-700 hover:bg-gray-50'
-              }`}
+              className="px-4 py-2 rounded-lg border hover:bg-gray-100 transition-colors"
             >
               Cancel
+            </button>
+            <button
+              onClick={handleAdopt}
+              className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white transition-colors"
+            >
+              Confirm
             </button>
           </div>
         </div>
       </Modal>
 
-      {/* AI Insights Modal */}
-      {selectedAIInsight && project.aiInsights && (
-        <Modal
-          isOpen={!!selectedAIInsight}
-          onClose={() => setSelectedAIInsight(null)}
-          title={
-            selectedAIInsight === 'health' 
-              ? 'Project Health Report' 
-              : selectedAIInsight === 'steps'
-                ? 'AI-Recommended Next Steps'
-                : 'AI-Generated Pitch Deck'
-          }
-          size="lg"
-        >
-          <div className="space-y-4">
-            {selectedAIInsight === 'health' && (
-              <div className="space-y-4">
-                <div className="text-center">
-                  <div className={`text-4xl font-bold mb-2 ${
-                    project.aiInsights.healthScore >= 80 ? 'text-green-500' :
-                    project.aiInsights.healthScore >= 60 ? 'text-yellow-500' : 'text-red-500'
-                  }`}>
-                    {project.aiInsights.healthScore}/100
-                  </div>
-                  <p className={isDarkMode ? 'text-gray-300' : 'text-gray-600'}>
-                    Overall Project Health Score
-                  </p>
-                </div>
-                <div className={`p-4 rounded-lg ${
-                  isDarkMode ? 'bg-gray-700' : 'bg-gray-50'
-                }`}>
-                  <p className={isDarkMode ? 'text-gray-300' : 'text-gray-600'}>
-                    This score is calculated based on code quality, documentation completeness, 
-                    contributor activity, and project momentum. A higher score indicates a 
-                    healthier, more maintainable project.
-                  </p>
-                </div>
-              </div>
-            )}
-
-            {selectedAIInsight === 'steps' && (
-              <div className="space-y-3">
-                {project.aiInsights.nextSteps.map((step, index) => (
-                  <div
-                    key={index}
-                    className={`p-4 rounded-lg border-l-4 border-blue-500 ${
-                      isDarkMode ? 'bg-blue-900/20' : 'bg-blue-50'
-                    }`}
-                  >
-                    <div className="flex items-start space-x-3">
-                      <span className={`flex-shrink-0 w-6 h-6 rounded-full bg-blue-500 text-white text-sm flex items-center justify-center font-medium`}>
-                        {index + 1}
-                      </span>
-                      <p className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>
-                        {step}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {selectedAIInsight === 'pitch' && (
-              <div className="space-y-4">
-                {project.aiInsights.pitchDeck.map((slide, index) => (
-                  <div
-                    key={index}
-                    className={`p-4 rounded-lg ${
-                      isDarkMode ? 'bg-gray-700' : 'bg-gray-50'
-                    }`}
-                  >
-                    <p className={isDarkMode ? 'text-gray-300' : 'text-gray-700'}>
-                      {slide}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </Modal>
-      )}
+      {/* AI Insight Modal */}
+      <Modal
+        isOpen={!!selectedAIInsight}
+        onClose={() => setSelectedAIInsight(null)}
+        title={
+          selectedAIInsight === 'health' ? 'Health Report' :
+          selectedAIInsight === 'steps' ? 'Next Steps' :
+          'Pitch Deck'
+        }
+      >
+        <div className="space-y-3">
+          {selectedAIInsight === 'health' && (
+            <p>
+              Health Score: {project.aiInsights?.healthScore || 0}/100
+            </p>
+          )}
+          {selectedAIInsight === 'steps' && (
+            <ul className="list-disc pl-5">
+              {nextSteps.map((step, index) => (
+                <li key={index}>{step}</li>
+              ))}
+            </ul>
+          )}
+          {selectedAIInsight === 'pitch' && (
+            <ul className="list-disc pl-5">
+              {pitchDeck.map((slide, index) => (
+                <li key={index}>{slide}</li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </Modal>
     </div>
   );
 };

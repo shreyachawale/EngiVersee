@@ -78,7 +78,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, showAdoptButton = tr
                 {tech}
               </span>
             ))}
-            {project.techStack.length > 3 && (
+            {project.techStack && project.techStack.length > 3 && (
               <span className={`px-2 py-1 text-xs rounded-full ${
                 isDarkMode ? 'text-gray-500' : 'text-gray-500'
               }`}>
@@ -115,7 +115,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, showAdoptButton = tr
                   isDarkMode ? 'text-gray-400' : 'text-gray-500'
                 }`} />
                 <span className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>
-                  {project.contributors.length}
+                  {Array.isArray(project.contributors) ? project.contributors.length : 0}
                 </span>
               </div>
               <span className={`px-2 py-1 rounded-full text-xs font-medium ${getDifficultyColor(project.difficulty)}`}>
@@ -128,7 +128,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, showAdoptButton = tr
                 isDarkMode ? 'text-gray-400' : 'text-gray-500'
               }`} />
               <span className={isDarkMode ? 'text-gray-400' : 'text-gray-600'}>
-                {new Date(project.lastActivity).toLocaleDateString()}
+                {project.lastActivity ? new Date(project.lastActivity).toLocaleDateString() : ''}
               </span>
             </div>
           </div>
