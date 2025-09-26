@@ -15,7 +15,7 @@ import {
   Clock
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
-import Modal from '../components/UI/Modal';
+import Modal from '../components/UI/ProjectModal';
 import { toast } from 'react-toastify';
 
 const ProjectDetail: React.FC = () => {

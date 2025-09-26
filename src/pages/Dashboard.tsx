@@ -16,7 +16,7 @@ import {
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 import ProjectCard from '../components/UI/ProjectCard';
-import Modal from '../components/UI/Modal';
+import Modal from '../components/UI/ProjectModal';
 
 const Dashboard: React.FC = () => {
   const { projects, user, notifications, isDarkMode, markNotificationRead } = useApp();

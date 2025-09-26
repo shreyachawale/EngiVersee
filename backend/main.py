@@ -7,7 +7,6 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 import google.generativeai as genai
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.middleware.cors import CORSMiddleware
 # ---------------- CONFIG ---------------- #
 GIT_PATH = r"C:\Program Files\Git\cmd\git.exe"
 PYLINT_CMD = [r"C:\Users\Shreya\AppData\Roaming\Python\Python312\Scripts\pylint.exe"]
@@ -23,20 +22,6 @@ genai.configure(api_key=API_KEY)
 # ---------------------------------------- #
 
 app = FastAPI()
-
-# Allow Cross-Origin requests from common local dev hosts (adjust as needed)
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=[
-        "http://localhost:5173",
-        "http://localhost:3000",
-        "http://127.0.0.1:5173",
-        "http://127.0.0.1:3000"
-    ],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
 
 app.add_middleware(
     CORSMiddleware,
